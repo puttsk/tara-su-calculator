@@ -1,8 +1,11 @@
 <template>
   <div id="app">
-    <div>
-      <h1>TARA SU Calculator</h1>
-      <tara-task />
+    <div class="page-container">
+      <div class="md-layout md-gutter">
+        <div class="md-layout-item">
+          <tara-task />
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -20,12 +23,5 @@ export default {
 
 <style>
 #app {
-  font-family: "Avenir", Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: left;
-  color: #2c3e50;
-  margin-top: 60px;
-  margin-left: 60px;
 }
 </style>
