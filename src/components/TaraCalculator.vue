@@ -1,11 +1,9 @@
 <template>
   <div>
-    <!-- SU calculator card -->
-    <md-card>
-      <md-card-header>
-        <div class="md-title">TARA SU Calculator</div>
-      </md-card-header>
-      <md-card-content>
+    <div class="md-layout" style="float:left;">
+      <!-- SU calculator card -->
+      <div style="padding:10px;">
+        <div class="md-title cal-title">TARA SU Calculator</div>
         <table>
           <template v-for="(job, jobId) in jobs">
             <!-- Job label. Show if there is more than 1 job type -->
@@ -166,17 +164,19 @@
           </tr>
           <!-- End summarize all job usage -->
         </table>
-      </md-card-content>
-      <md-card-actions>
-        <md-button v-on:click="addJob" class="md-dense md-raised md-primary">
-          Add Job Type
-        </md-button>
-        <md-button v-on:click="reset" class="md-dense md-raised md-primary">
-          Reset
-        </md-button>
-      </md-card-actions>
-    </md-card>
-    <!-- End SU calculator card -->
+
+        <div style="text-align:right;">
+          <br />
+          <md-button v-on:click="addJob" class="md-dense md-raised md-primary">
+            Add Job Type
+          </md-button>
+          <md-button v-on:click="reset" class="md-dense md-raised md-primary">
+            Reset
+          </md-button>
+        </div>
+      </div>
+      <!-- End SU calculator card -->
+    </div>
 
     <!-- Pricing card -->
     <md-card>
@@ -199,11 +199,11 @@
           </template>
         </md-table>
 
-        <!-- End pricing card -->
         <br />
         <b>Price per SU: </b> {{ pricePerSU }} THB
       </md-card-content>
     </md-card>
+    <!-- End pricing card -->
   </div>
 </template>
 
@@ -405,5 +405,13 @@ td .md-field {
 .md-field .md-input.number-field {
   text-align: right;
   width: 100px;
+}
+.cal-title {
+  padding: 16px 0;
+  margin-top: 8px;
+  font-size: 24px;
+  letter-spacing: 0;
+  line-height: 32px;
+  font-weight: 400;
 }
 </style>

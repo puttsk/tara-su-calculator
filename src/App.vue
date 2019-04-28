@@ -2,10 +2,11 @@
   <div id="app">
     <div class="page-container">
       <md-app>
+        <md-app-toolbar class="md-primary">
+          <span class="md-title">Tara Pricing Calculator</span>
+        </md-app-toolbar>
         <md-app-content>
-          <div class="md-layout">
-            <tara-calculator />
-          </div>
+          <tara-calculator />
         </md-app-content>
       </md-app>
     </div>
