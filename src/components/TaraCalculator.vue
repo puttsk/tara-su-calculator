@@ -1,27 +1,27 @@
 <template>
   <div>
     <div class="md-layout" style="float:left;">
-      <!-- SU calculator card -->
+      <!-- SU calculator -->
       <div style="padding:10px;">
         <div class="md-title cal-title">TARA SU Calculator</div>
         <table>
-          <template v-for="(job, jobId) in jobs">
-            <!-- Job label. Show if there is more than 1 job type -->
-            <tr v-if="jobs.length > 1" v-bind:key="jobId + '-label'">
+          <template v-for="(project, projectId) in projects">
+            <!-- Project label. Show if there is more than 1 project -->
+            <tr v-if="projects.length > 1" v-bind:key="projectId + '-label'">
               <br />
-              <b>Job Type:</b>
+              <b>Project:</b>
               {{
-                jobId + 1
+                projectId + 1
               }}
             </tr>
-            <!-- End job label.-->
-            <!-- Job resource usage -->
-            <tr v-bind:key="jobId + '-job'">
+            <!-- End project label.-->
+            <!-- Project resource usage -->
+            <tr v-bind:key="projectId + '-project'">
               <th>Type</th>
               <th class="num-col">
                 <md-field class="col-field">
                   <span class="md-prefix th-field">Time (</span>
-                  <md-select v-model="job.timeUnit" md-dense>
+                  <md-select v-model="project.timeUnit" md-dense>
                     <md-option
                       v-for="(val, key) in timeFactor"
                       :value="key"
@@ -49,8 +49,8 @@
               </th>
             </tr>
             <tr
-              v-for="(partition, index) in job.partitions"
-              v-bind:key="jobId + '-' + index + '-object'"
+              v-for="(partition, index) in project.partitions"
+              v-bind:key="projectId + '-' + index + '-object'"
             >
               <td>{{ partition.name }}</td>
               <td class="num-col">
@@ -61,7 +61,7 @@
                     class="number-field"
                   />
                   <span class="md-suffix inline-field">
-                    {{ job.timeUnit }}
+                    {{ project.timeUnit }}
                   </span>
                 </md-field>
               </td>
@@ -81,7 +81,7 @@
               <td class="num-col border-left">
                 {{
                   (partition.walltime *
-                    timeFactor[job.timeUnit] *
+                    timeFactor[project.timeUnit] *
                     partition.usage *
                     partition.suFactor)
                     | roundup
@@ -90,7 +90,7 @@
               <td class="num-col">
                 {{
                   (partition.walltime *
-                    timeFactor[job.timeUnit] *
+                    timeFactor[project.timeUnit] *
                     partition.usage *
                     partition.suFactor *
                     pricePerSU)
@@ -100,7 +100,7 @@
               <td class="num-col">
                 {{
                   ((partition.walltime *
-                    timeFactor[job.timeUnit] *
+                    timeFactor[project.timeUnit] *
                     partition.usage *
                     partition.suFactor *
                     pricePerSU *
@@ -110,13 +110,13 @@
                 }}
               </td>
             </tr>
-            <!-- End Job resource usage -->
+            <!-- End Project resource usage -->
 
-            <!-- Job subtotal. Show if there is more than 1 job type, else add an empty row for better look -->
-            <template v-if="jobs.length > 1">
+            <!-- Project subtotal. Show if there is more than 1 project, else add an empty row for better look -->
+            <template v-if="projects.length > 1">
               <tr
                 style="line-height:10px;"
-                v-bind:key="jobId + '-subtotal-space'"
+                v-bind:key="projectId + '-subtotal-space'"
               >
                 <td></td>
                 <td></td>
@@ -124,25 +124,25 @@
                 <td class="num-col border-left"></td>
                 <td>&nbsp;</td>
               </tr>
-              <tr v-bind:key="jobId + '-subtotal'" class="row-subtotal">
+              <tr v-bind:key="projectId + '-subtotal'" class="row-subtotal">
                 <td></td>
                 <td></td>
                 <td class="num-col"><b>Subtotal:</b></td>
                 <td class="num-col border-left subtotal">
-                  {{ [job] | sumSU | roundup }}
+                  {{ [project] | sumSU | roundup }}
                 </td>
                 <td class="num-col subtotal">
-                  {{ [job] | sumCost | roundup }}
+                  {{ [project] | sumCost | roundup }}
                 </td>
                 <td class="num-col subtotal">
-                  {{ [job] | sumDiscount | roundup }}
+                  {{ [project] | sumDiscount | roundup }}
                 </td>
               </tr>
             </template>
             <template v-else>
               <tr
                 style="line-height:10px;"
-                v-bind:key="jobId + '-subtotal-space'"
+                v-bind:key="projectId + '-subtotal-space'"
               >
                 <td></td>
                 <td></td>
@@ -151,31 +151,34 @@
                 <td>&nbsp;</td>
               </tr>
             </template>
-            <!-- End job subtotal.-->
+            <!-- End project subtotal.-->
           </template>
-          <!-- Summarize all job usage -->
+          <!-- Summarize all project usage -->
           <tr class="row-sum">
             <td></td>
             <td></td>
             <td class="num-col"><b>Total:</b></td>
-            <td class="num-col">{{ jobs | sumSU | roundup }}</td>
-            <td class="num-col">{{ jobs | sumCost | roundup }}</td>
-            <td class="num-col">{{ jobs | sumDiscount | roundup }}</td>
+            <td class="num-col">{{ projects | sumSU | roundup }}</td>
+            <td class="num-col">{{ projects | sumCost | roundup }}</td>
+            <td class="num-col">{{ projects | sumDiscount | roundup }}</td>
           </tr>
-          <!-- End summarize all job usage -->
+          <!-- End summarize all project usage -->
         </table>
 
         <div style="text-align:right;">
           <br />
-          <md-button v-on:click="addJob" class="md-dense md-raised md-primary">
-            Add Job Type
+          <md-button
+            v-on:click="addProject"
+            class="md-dense md-raised md-primary"
+          >
+            Add Project
           </md-button>
           <md-button v-on:click="reset" class="md-dense md-raised md-primary">
             Reset
           </md-button>
         </div>
       </div>
-      <!-- End SU calculator card -->
+      <!-- End SU calculator -->
     </div>
 
     <!-- Pricing card -->
@@ -190,8 +193,10 @@
             <th class="num-col">Unit</th>
             <th class="num-col long">SU/Unit-Min</th>
           </tr>
-          <template v-for="(partition, jobId) in jobTemplate.partitions">
-            <tr v-bind:key="jobId + '-type'">
+          <template
+            v-for="(partition, projectId) in projectTemplate.partitions"
+          >
+            <tr v-bind:key="projectId + '-type'">
               <td>{{ partition.name }}</td>
               <td class="num-col">{{ partition.unit }}</td>
               <td class="num-col">{{ partition.suFactor }}</td>
@@ -208,7 +213,7 @@
 </template>
 
 <script>
-var jobTemplate = {
+var projectTemplate = {
   timeUnit: "mins",
   partitions: [
     {
@@ -270,8 +275,8 @@ export default {
     return {
       discountPercent: discountPercent,
       pricePerSU: pricePerSU,
-      jobs: [JSON.parse(JSON.stringify(jobTemplate))],
-      jobTemplate: jobTemplate,
+      projects: [JSON.parse(JSON.stringify(projectTemplate))],
+      projectTemplate: projectTemplate,
       timeFactor: timeFactor
     };
   },
@@ -281,28 +286,28 @@ export default {
       if (!value) return "0.00";
       return value.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     },
-    sumSU: function(jobs) {
+    sumSU: function(projects) {
       var sum = 0;
-      for (var i = 0; i < jobs.length; i++) {
-        for (var j = 0; j < jobs[i].partitions.length; j++) {
-          var partition = jobs[i].partitions[j];
+      for (var i = 0; i < projects.length; i++) {
+        for (var j = 0; j < projects[i].partitions.length; j++) {
+          var partition = projects[i].partitions[j];
           sum +=
             partition.walltime *
-            timeFactor[jobs[i].timeUnit] *
+            timeFactor[projects[i].timeUnit] *
             partition.usage *
             partition.suFactor;
         }
       }
       return sum;
     },
-    sumCost: function(jobs) {
+    sumCost: function(projects) {
       var sum = 0;
-      for (var i = 0; i < jobs.length; i++) {
-        for (var j = 0; j < jobs[i].partitions.length; j++) {
-          var partition = jobs[i].partitions[j];
+      for (var i = 0; i < projects.length; i++) {
+        for (var j = 0; j < projects[i].partitions.length; j++) {
+          var partition = projects[i].partitions[j];
           sum +=
             partition.walltime *
-            timeFactor[jobs[i].timeUnit] *
+            timeFactor[projects[i].timeUnit] *
             partition.usage *
             partition.suFactor *
             pricePerSU;
@@ -310,14 +315,14 @@ export default {
       }
       return sum;
     },
-    sumDiscount: function(jobs) {
+    sumDiscount: function(projects) {
       var sum = 0;
-      for (var i = 0; i < jobs.length; i++) {
-        for (var j = 0; j < jobs[i].partitions.length; j++) {
-          var partition = jobs[i].partitions[j];
+      for (var i = 0; i < projects.length; i++) {
+        for (var j = 0; j < projects[i].partitions.length; j++) {
+          var partition = projects[i].partitions[j];
           sum +=
             partition.walltime *
-            timeFactor[jobs[i].timeUnit] *
+            timeFactor[projects[i].timeUnit] *
             partition.usage *
             partition.suFactor *
             pricePerSU;
@@ -327,11 +332,11 @@ export default {
     }
   },
   methods: {
-    addJob: function() {
-      this.jobs.push(JSON.parse(JSON.stringify(jobTemplate)));
+    addProject: function() {
+      this.projects.push(JSON.parse(JSON.stringify(projectTemplate)));
     },
     reset: function() {
-      this.jobs = [JSON.parse(JSON.stringify(jobTemplate))];
+      this.projects = [JSON.parse(JSON.stringify(projectTemplate))];
     }
   }
 };
