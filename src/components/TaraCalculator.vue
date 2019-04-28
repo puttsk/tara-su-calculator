@@ -265,7 +265,7 @@ var timeFactor = {
 };
 
 export default {
-  name: "TaraTask",
+  name: "TaraCalculator",
   data: function() {
     return {
       discountPercent: discountPercent,

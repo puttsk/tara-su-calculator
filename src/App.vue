@@ -1,22 +1,24 @@
 <template>
   <div id="app">
     <div class="page-container">
-      <div class="md-layout md-gutter">
-        <div class="md-layout-item">
-          <tara-task />
-        </div>
-      </div>
+      <md-app>
+        <md-app-content>
+          <div class="md-layout">
+            <tara-calculator />
+          </div>
+        </md-app-content>
+      </md-app>
     </div>
   </div>
 </template>
 
 <script>
-import TaraTask from "./components/TaraTask.vue";
+import TaraCalculator from "./components/TaraCalculator.vue";
 
 export default {
   name: "app",
   components: {
-    TaraTask
+    TaraCalculator
   }
 };
 </script>
