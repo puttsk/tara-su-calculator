@@ -5,7 +5,7 @@
         <div class="md-title">TARA SU Calculator</div>
       </md-card-header>
       <md-card-content>
-        <table style="border-collapse:collapse;">
+        <table>
           <template v-for="(task, taskId) in tasks">
             <tr v-if="tasks.length > 1" v-bind:key="taskId + '-label'">
               <br />
@@ -15,10 +15,10 @@
               }}
             </tr>
             <tr v-bind:key="taskId + '-job'">
-              <th style="min-width:80px;">Type</th>
-              <th style="width:80px;" class="total-col">
-                <md-field style="width:120px; text-align:right;">
-                  <span class="md-prefix">Time (</span>
+              <th>Type</th>
+              <th class="num-col">
+                <md-field class="col-field">
+                  <span class="md-prefix th-field">Time (</span>
                   <md-select v-model="task.timeUnit" md-dense>
                     <md-option
                       v-for="(val, key) in timeFactor"
@@ -28,13 +28,13 @@
                       {{ key }}
                     </md-option>
                   </md-select>
-                  <span class="md-suffix">)</span>
+                  <span class="md-suffix th-field">)</span>
                 </md-field>
               </th>
-              <th style="width:80px;" class="total-col">Usage</th>
-              <th style="min-width:100px;" class="total-col">SU</th>
-              <th style="min-width:100px;" class="total-col">Cost (THB)</th>
-              <th style="min-width:100px;" class="total-col">
+              <th class="num-col">Usage</th>
+              <th class="num-col long">SU</th>
+              <th class="num-col long">Cost (THB)</th>
+              <th class="num-col long">
                 Discount
                 <md-field>
                   <md-input
@@ -43,8 +43,7 @@
                     style="text-align:right; width:20px;"
                   />
                   <span
-                    class="md-suffix"
-                    style="text-align:right;font-size:small;"
+                    class="md-suffix th-field"
                   >
                     %
                   </span>
@@ -56,38 +55,37 @@
               v-bind:key="taskId + '-' + index + '-object'"
             >
               <td>{{ t.nodeType }}</td>
-              <td class="total-col">
+              <td class="num-col">
                 <md-field>
                   <md-input
                     v-model="t.nodeTime"
                     type="number"
-                    style="text-align:right; width:100px;"
+                    class="number-field"
                   />
                   <span
-                    class="md-suffix"
-                    style="text-align:right; font-size:small;"
+                    class="md-suffix inline-field"
                   >
                     {{ task.timeUnit }}
                   </span>
                 </md-field>
               </td>
-              <td class="total-col">
+              <td class="num-col">
                 <!--input type="range" v-model.number="t.nodeCount"  /-->
                 <md-field>
                   <md-input
                     v-model="t.nodeCount"
                     type="number"
-                    style="text-align:right; width:100px; "
+                    class="number-field"
                   />
                   <span
-                    class="md-suffix"
-                    style="text-align:right; width:35px; font-size:small;"
+                    class="md-suffix inline-field"
+                    style="width:35px;"
                   >
                     {{ t.nodeUnit }}
                   </span>
                 </md-field>
               </td>
-              <td class="total-col" style="border-left:1pt solid lightgray;">
+              <td class="num-col border-left">
                 {{
                   (t.nodeTime *
                     timeFactor[task.timeUnit] *
@@ -96,7 +94,7 @@
                     | roundup
                 }}
               </td>
-              <td class="total-col">
+              <td class="num-col">
                 {{
                   (t.nodeTime *
                     timeFactor[task.timeUnit] *
@@ -106,7 +104,7 @@
                     | roundup
                 }}
               </td>
-              <td class="total-col">
+              <td class="num-col">
                 {{
                   ((t.nodeTime *
                     timeFactor[task.timeUnit] *
@@ -121,15 +119,19 @@
             </tr>
           </template>
           <tr style="line-height:10px;">
-            &nbsp;
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="num-col border-left"></td>
+            <td>&nbsp;</td>
           </tr>
           <tr class="row-sum">
             <td></td>
             <td></td>
-            <td class="total-col"><b>Total:</b></td>
-            <td class="total-col">{{ tasks | sumSU | roundup }}</td>
-            <td class="total-col">{{ tasks | sumCost | roundup }}</td>
-            <td class="total-col">{{ tasks | sumDiscount | roundup }}</td>
+            <td class="num-col"><b>Total:</b></td>
+            <td class="num-col">{{ tasks | sumSU | roundup }}</td>
+            <td class="num-col">{{ tasks | sumCost | roundup }}</td>
+            <td class="num-col">{{ tasks | sumDiscount | roundup }}</td>
           </tr>
         </table>
       </md-card-content>
@@ -148,17 +150,17 @@
         <div class="md-title">Pricing</div>
       </md-card-header>
       <md-card-content>
-        <md-table style="border-collapse:collapse;">
+        <md-table>
           <tr>
             <th style="min-width:140px;">Type</th>
-            <th class="total-col" style="min-width:80px;">Unit</th>
-            <th class="total-col" style="min-width:100px;">SU/Unit-Min</th>
+            <th class="num-col">Unit</th>
+            <th class="num-col long">SU/Unit-Min</th>
           </tr>
           <template v-for="(t, taskId) in taskTemplate.partitionClass">
             <tr v-bind:key="taskId + '-type'">
               <td>{{ t.nodeType }}</td>
-              <td class="total-col">{{ t.nodeUnit }}</td>
-              <td class="total-col">{{ t.nodeFactor }}</td>
+              <td class="num-col">{{ t.nodeUnit }}</td>
+              <td class="num-col">{{ t.nodeFactor }}</td>
             </tr>
           </template>
         </md-table>
@@ -302,9 +304,9 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.total-col {
-  text-align: right;
-  padding: 0 20px 0 5px;
+table {
+  border-collapse: separate;
+  border-spacing: 0px;
 }
 table td {
   text-align: left;
@@ -312,6 +314,20 @@ table td {
 table th {
   text-align: left;
   border-bottom: 1pt solid lightgray;
+  min-width: 80px;
+}
+th.num-col,
+td.num-col {
+  text-align: right;
+  padding: 0 20px 0 5px;
+}
+th.num-col.long,
+td.num-col.long {
+  min-width: 100px;
+}
+th.num-col.border-left,
+td.num-col.border-left {
+  border-left: 1pt solid lightgray;
 }
 tr.row-sum td {
   padding-top: 0.5em;
@@ -330,5 +346,23 @@ td .md-field {
   padding: 10px;
   display: inline-block;
   vertical-align: top;
+}
+.md-field.col-field {
+  width: 120px;
+  text-align: right;
+  margin-bottom: -6px;
+}
+.md-field .md-prefix.th-field, 
+.md-field .md-suffix.th-field {
+  font-size: 14px;
+  color: black;
+}
+.md-field .md-suffix.inline-field {
+  text-align: right;
+  font-size: small;
+}
+.md-field .md-input.number-field {
+  text-align: right;
+  width: 100px;
 }
 </style>
