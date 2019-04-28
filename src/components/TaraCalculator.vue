@@ -7,12 +7,18 @@
         <table>
           <template v-for="(project, projectId) in projects">
             <!-- Project label. Show if there is more than 1 project -->
-            <tr v-if="projects.length > 1" v-bind:key="projectId + '-label'">
+            <!--tr v-if="projects.length > 1" v-bind:key="projectId + '-label'">
               <br />
               <b>Project:</b>
               {{
                 projectId + 1
               }}
+            </tr-->
+            <tr v-bind:key="projectId + '-label'">
+              <md-field class="col-field">
+                <label>Project Name</label>
+                <md-input v-model="project.name" type="string" />
+              </md-field>
             </tr>
             <!-- End project label.-->
             <!-- Project resource usage -->
@@ -33,7 +39,17 @@
                   <span class="md-suffix th-field">)</span>
                 </md-field>
               </th>
-              <th class="num-col">Usage</th>
+              <th class="num-col">
+                <md-field>
+                  <span class="md-prefix th-field">Usage (</span>
+                  <md-input
+                    v-model="project.runs"
+                    type="number"
+                    style="text-align:right; width:50px;"
+                  />
+                  <span class="md-suffix th-field">runs)</span>
+                </md-field>
+              </th>
               <th class="num-col long">SU</th>
               <th class="num-col long">Cost (THB)</th>
               <th class="num-col long">
@@ -83,6 +99,7 @@
                   (partition.walltime *
                     timeFactor[project.timeUnit] *
                     partition.usage *
+                    project.runs *
                     partition.suFactor)
                     | roundup
                 }}
@@ -92,6 +109,7 @@
                   (partition.walltime *
                     timeFactor[project.timeUnit] *
                     partition.usage *
+                    project.runs *
                     partition.suFactor *
                     pricePerSU)
                     | roundup
@@ -102,6 +120,7 @@
                   ((partition.walltime *
                     timeFactor[project.timeUnit] *
                     partition.usage *
+                    project.runs *
                     partition.suFactor *
                     pricePerSU *
                     (100 - discountPercent)) /
@@ -214,6 +233,8 @@
 
 <script>
 var projectTemplate = {
+  runs: 1,
+  name: "Project1",
   timeUnit: "mins",
   partitions: [
     {
@@ -295,6 +316,7 @@ export default {
             partition.walltime *
             timeFactor[projects[i].timeUnit] *
             partition.usage *
+            projects[i].runs *
             partition.suFactor;
         }
       }
@@ -309,6 +331,7 @@ export default {
             partition.walltime *
             timeFactor[projects[i].timeUnit] *
             partition.usage *
+            projects[i].runs *
             partition.suFactor *
             pricePerSU;
         }
@@ -324,6 +347,7 @@ export default {
             partition.walltime *
             timeFactor[projects[i].timeUnit] *
             partition.usage *
+            projects[i].runs *
             partition.suFactor *
             pricePerSU;
         }
@@ -333,7 +357,9 @@ export default {
   },
   methods: {
     addProject: function() {
-      this.projects.push(JSON.parse(JSON.stringify(projectTemplate)));
+      var project = JSON.parse(JSON.stringify(projectTemplate));
+      project.name = "Project" + (this.projects.length + 1);
+      this.projects.push(project);
     },
     reset: function() {
       this.projects = [JSON.parse(JSON.stringify(projectTemplate))];
