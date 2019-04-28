@@ -1,25 +1,28 @@
 <template>
   <div>
+    <!-- SU calculator card -->
     <md-card>
       <md-card-header>
         <div class="md-title">TARA SU Calculator</div>
       </md-card-header>
       <md-card-content>
         <table>
-          <template v-for="(task, taskId) in tasks">
-            <tr v-if="tasks.length > 1" v-bind:key="taskId + '-label'">
+          <template v-for="(job, jobId) in jobs">
+            <!-- Job label. Show if there is more than 1 job type -->
+            <tr v-if="jobs.length > 1" v-bind:key="jobId + '-label'">
               <br />
               <b>Job Type:</b>
               {{
-                taskId + 1
+                jobId + 1
               }}
             </tr>
-            <tr v-bind:key="taskId + '-job'">
+            <!-- Job resource usage -->
+            <tr v-bind:key="jobId + '-job'">
               <th>Type</th>
               <th class="num-col">
                 <md-field class="col-field">
                   <span class="md-prefix th-field">Time (</span>
-                  <md-select v-model="task.timeUnit" md-dense>
+                  <md-select v-model="job.timeUnit" md-dense>
                     <md-option
                       v-for="(val, key) in timeFactor"
                       :value="key"
@@ -38,85 +41,77 @@
                 Discount
                 <md-field>
                   <md-input
-                    v-model="discount"
+                    v-model="discountPercent"
                     type="number"
                     style="text-align:right; width:20px;"
                   />
-                  <span
-                    class="md-suffix th-field"
-                  >
-                    %
-                  </span>
+                  <span class="md-suffix th-field">%</span>
                 </md-field>
               </th>
             </tr>
             <tr
-              v-for="(t, index) in task.partitionClass"
-              v-bind:key="taskId + '-' + index + '-object'"
+              v-for="(partition, index) in job.partitions"
+              v-bind:key="jobId + '-' + index + '-object'"
             >
-              <td>{{ t.nodeType }}</td>
+              <td>{{ partition.name }}</td>
               <td class="num-col">
                 <md-field>
                   <md-input
-                    v-model="t.nodeTime"
+                    v-model="partition.walltime"
                     type="number"
                     class="number-field"
                   />
-                  <span
-                    class="md-suffix inline-field"
-                  >
-                    {{ task.timeUnit }}
+                  <span class="md-suffix inline-field">
+                    {{ job.timeUnit }}
                   </span>
                 </md-field>
               </td>
               <td class="num-col">
-                <!--input type="range" v-model.number="t.nodeCount"  /-->
+                <!--input type="range" v-model.number="t.usage"  /-->
                 <md-field>
                   <md-input
-                    v-model="t.nodeCount"
+                    v-model="partition.usage"
                     type="number"
                     class="number-field"
                   />
-                  <span
-                    class="md-suffix inline-field"
-                    style="width:35px;"
-                  >
-                    {{ t.nodeUnit }}
+                  <span class="md-suffix inline-field" style="width:35px;">
+                    {{ partition.unit }}
                   </span>
                 </md-field>
               </td>
               <td class="num-col border-left">
                 {{
-                  (t.nodeTime *
-                    timeFactor[task.timeUnit] *
-                    t.nodeCount *
-                    t.nodeFactor)
+                  (partition.walltime *
+                    timeFactor[job.timeUnit] *
+                    partition.usage *
+                    partition.suFactor)
                     | roundup
                 }}
               </td>
               <td class="num-col">
                 {{
-                  (t.nodeTime *
-                    timeFactor[task.timeUnit] *
-                    t.nodeCount *
-                    t.nodeFactor *
+                  (partition.walltime *
+                    timeFactor[job.timeUnit] *
+                    partition.usage *
+                    partition.suFactor *
                     pricePerSU)
                     | roundup
                 }}
               </td>
               <td class="num-col">
                 {{
-                  ((t.nodeTime *
-                    timeFactor[task.timeUnit] *
-                    t.nodeCount *
-                    t.nodeFactor *
+                  ((partition.walltime *
+                    timeFactor[job.timeUnit] *
+                    partition.usage *
+                    partition.suFactor *
                     pricePerSU *
-                    (100 - discount)) /
+                    (100 - discountPercent)) /
                     100)
                     | roundup
                 }}
               </td>
             </tr>
+            <!-- End Job resource usage -->
           </template>
           <tr style="line-height:10px;">
             <td></td>
@@ -125,18 +120,20 @@
             <td class="num-col border-left"></td>
             <td>&nbsp;</td>
           </tr>
+          <!-- Summarize all job usage -->
           <tr class="row-sum">
             <td></td>
             <td></td>
             <td class="num-col"><b>Total:</b></td>
-            <td class="num-col">{{ tasks | sumSU | roundup }}</td>
-            <td class="num-col">{{ tasks | sumCost | roundup }}</td>
-            <td class="num-col">{{ tasks | sumDiscount | roundup }}</td>
+            <td class="num-col">{{ jobs | sumSU | roundup }}</td>
+            <td class="num-col">{{ jobs | sumCost | roundup }}</td>
+            <td class="num-col">{{ jobs | sumDiscount | roundup }}</td>
           </tr>
+          <!-- End summarize all job usage -->
         </table>
       </md-card-content>
       <md-card-actions>
-        <md-button v-on:click="addTask" class="md-dense md-raised md-primary">
+        <md-button v-on:click="addJob" class="md-dense md-raised md-primary">
           Add Job Type
         </md-button>
         <md-button v-on:click="reset" class="md-dense md-raised md-primary">
@@ -144,7 +141,9 @@
         </md-button>
       </md-card-actions>
     </md-card>
+    <!-- End SU calculator card -->
 
+    <!-- Pricing card -->
     <md-card>
       <md-card-header>
         <div class="md-title">Pricing</div>
@@ -156,15 +155,16 @@
             <th class="num-col">Unit</th>
             <th class="num-col long">SU/Unit-Min</th>
           </tr>
-          <template v-for="(t, taskId) in taskTemplate.partitionClass">
-            <tr v-bind:key="taskId + '-type'">
-              <td>{{ t.nodeType }}</td>
-              <td class="num-col">{{ t.nodeUnit }}</td>
-              <td class="num-col">{{ t.nodeFactor }}</td>
+          <template v-for="(partition, jobId) in jobTemplate.partitions">
+            <tr v-bind:key="jobId + '-type'">
+              <td>{{ partition.name }}</td>
+              <td class="num-col">{{ partition.unit }}</td>
+              <td class="num-col">{{ partition.suFactor }}</td>
             </tr>
           </template>
         </md-table>
 
+        <!-- End pricing card -->
         <br />
         <b>Price per SU: </b> {{ pricePerSU }} THB
       </md-card-content>
@@ -173,56 +173,56 @@
 </template>
 
 <script>
-var taskTemplate = {
+var jobTemplate = {
   timeUnit: "mins",
-  partitionClass: [
+  partitions: [
     {
-      nodeType: "compute",
-      nodeTime: 1,
-      nodeCount: 1,
-      nodeFactor: 1,
-      nodeUnit: "cores"
+      name: "compute",
+      walltime: 1,
+      usage: 1,
+      suFactor: 1,
+      unit: "cores"
     },
     {
-      nodeType: "memory",
-      nodeTime: 0,
-      nodeCount: 0,
-      nodeFactor: 1.25,
-      nodeUnit: "cores"
+      name: "memory",
+      walltime: 0,
+      usage: 0,
+      suFactor: 1.25,
+      unit: "cores"
     },
     {
-      nodeType: "memory",
-      nodeTime: 0,
-      nodeCount: 0,
-      nodeFactor: 0.08,
-      nodeUnit: "GB"
+      name: "memory",
+      walltime: 0,
+      usage: 0,
+      suFactor: 0.08,
+      unit: "GB"
     },
     {
-      nodeType: "memory-preempt",
-      nodeTime: 0,
-      nodeCount: 0,
-      nodeFactor: 0.5,
-      nodeUnit: "cores"
+      name: "memory-preempt",
+      walltime: 0,
+      usage: 0,
+      suFactor: 0.5,
+      unit: "cores"
     },
     {
-      nodeType: "memory-preempt",
-      nodeTime: 0,
-      nodeCount: 0,
-      nodeFactor: 0.032,
-      nodeUnit: "GB"
+      name: "memory-preempt",
+      walltime: 0,
+      usage: 0,
+      suFactor: 0.032,
+      unit: "GB"
     },
     {
-      nodeType: "gpu",
-      nodeTime: 0,
-      nodeCount: 0,
-      nodeFactor: 130,
-      nodeUnit: "nodes"
+      name: "gpu",
+      walltime: 0,
+      usage: 0,
+      suFactor: 130,
+      unit: "nodes"
     }
   ]
 };
 
 var pricePerSU = 0.0202;
-var discount = 50;
+var discountPercent = 50;
 var timeFactor = {
   mins: 1,
   hrs: 60,
@@ -233,10 +233,10 @@ export default {
   name: "TaraTask",
   data: function() {
     return {
-      discount: discount,
+      discountPercent: discountPercent,
       pricePerSU: pricePerSU,
-      tasks: [JSON.parse(JSON.stringify(taskTemplate))],
-      taskTemplate: taskTemplate,
+      jobs: [JSON.parse(JSON.stringify(jobTemplate))],
+      jobTemplate: jobTemplate,
       timeFactor: timeFactor
     };
   },
@@ -246,57 +246,57 @@ export default {
       if (!value) return "0.00";
       return value.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     },
-    sumSU: function(tasks) {
+    sumSU: function(jobs) {
       var sum = 0;
-      for (var i = 0; i < tasks.length; i++) {
-        for (var j = 0; j < tasks[i].partitionClass.length; j++) {
-          var t = tasks[i].partitionClass[j];
+      for (var i = 0; i < jobs.length; i++) {
+        for (var j = 0; j < jobs[i].partitions.length; j++) {
+          var partition = jobs[i].partitions[j];
           sum +=
-            t.nodeTime *
-            timeFactor[tasks[i].timeUnit] *
-            t.nodeCount *
-            t.nodeFactor;
+            partition.walltime *
+            timeFactor[jobs[i].timeUnit] *
+            partition.usage *
+            partition.suFactor;
         }
       }
       return sum;
     },
-    sumCost: function(tasks) {
+    sumCost: function(jobs) {
       var sum = 0;
-      for (var i = 0; i < tasks.length; i++) {
-        for (var j = 0; j < tasks[i].partitionClass.length; j++) {
-          var t = tasks[i].partitionClass[j];
+      for (var i = 0; i < jobs.length; i++) {
+        for (var j = 0; j < jobs[i].partitions.length; j++) {
+          var partition = jobs[i].partitions[j];
           sum +=
-            t.nodeTime *
-            timeFactor[tasks[i].timeUnit] *
-            t.nodeCount *
-            t.nodeFactor *
+            partition.walltime *
+            timeFactor[jobs[i].timeUnit] *
+            partition.usage *
+            partition.suFactor *
             pricePerSU;
         }
       }
       return sum;
     },
-    sumDiscount: function(tasks) {
+    sumDiscount: function(jobs) {
       var sum = 0;
-      for (var i = 0; i < tasks.length; i++) {
-        for (var j = 0; j < tasks[i].partitionClass.length; j++) {
-          var t = tasks[i].partitionClass[j];
+      for (var i = 0; i < jobs.length; i++) {
+        for (var j = 0; j < jobs[i].partitions.length; j++) {
+          var partition = jobs[i].partitions[j];
           sum +=
-            t.nodeTime *
-            timeFactor[tasks[i].timeUnit] *
-            t.nodeCount *
-            t.nodeFactor *
+            partition.walltime *
+            timeFactor[jobs[i].timeUnit] *
+            partition.usage *
+            partition.suFactor *
             pricePerSU;
         }
       }
-      return (sum * (100 - discount)) / 100;
+      return (sum * (100 - discountPercent)) / 100;
     }
   },
   methods: {
-    addTask: function() {
-      this.tasks.push(JSON.parse(JSON.stringify(taskTemplate)));
+    addJob: function() {
+      this.jobs.push(JSON.parse(JSON.stringify(jobTemplate)));
     },
     reset: function() {
-      this.tasks = [JSON.parse(JSON.stringify(taskTemplate))];
+      this.jobs = [JSON.parse(JSON.stringify(jobTemplate))];
     }
   }
 };
@@ -352,7 +352,7 @@ td .md-field {
   text-align: right;
   margin-bottom: -6px;
 }
-.md-field .md-prefix.th-field, 
+.md-field .md-prefix.th-field,
 .md-field .md-suffix.th-field {
   font-size: 14px;
   color: black;
