@@ -16,6 +16,7 @@
                 jobId + 1
               }}
             </tr>
+            <!-- End job label.-->
             <!-- Job resource usage -->
             <tr v-bind:key="jobId + '-job'">
               <th>Type</th>
@@ -112,14 +113,48 @@
               </td>
             </tr>
             <!-- End Job resource usage -->
+
+            <!-- Job subtotal. Show if there is more than 1 job type, else add an empty row for better look -->
+            <template v-if="jobs.length > 1">
+              <tr
+                style="line-height:10px;"
+                v-bind:key="jobId + '-subtotal-space'"
+              >
+                <td></td>
+                <td></td>
+                <td></td>
+                <td class="num-col border-left"></td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr v-bind:key="jobId + '-subtotal'" class="row-subtotal">
+                <td></td>
+                <td></td>
+                <td class="num-col"><b>Subtotal:</b></td>
+                <td class="num-col border-left subtotal">
+                  {{ [job] | sumSU | roundup }}
+                </td>
+                <td class="num-col subtotal">
+                  {{ [job] | sumCost | roundup }}
+                </td>
+                <td class="num-col subtotal">
+                  {{ [job] | sumDiscount | roundup }}
+                </td>
+              </tr>
+            </template>
+            <template v-else>
+              <tr
+                style="line-height:10px;"
+                v-bind:key="jobId + '-subtotal-space'"
+              >
+                <td></td>
+                <td></td>
+                <td></td>
+                <td class="num-col border-left"></td>
+                <td>&nbsp;</td>
+              </tr>
+            </template>
+            <!-- End job subtotal.-->
           </template>
-          <tr style="line-height:10px;">
-            <td></td>
-            <td></td>
-            <td></td>
-            <td class="num-col border-left"></td>
-            <td>&nbsp;</td>
-          </tr>
           <!-- Summarize all job usage -->
           <tr class="row-sum">
             <td></td>
@@ -324,6 +359,12 @@ td.num-col {
 th.num-col.long,
 td.num-col.long {
   min-width: 100px;
+}
+td.num-col.subtotal {
+  border-top: 1pt solid lightgray;
+}
+tr.row-subtotal td {
+  border-bottom: 1pt solid lightgray;
 }
 th.num-col.border-left,
 td.num-col.border-left {
