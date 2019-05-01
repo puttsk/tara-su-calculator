@@ -12,7 +12,12 @@ cd dist
 # if you are deploying to a custom domain
 # echo 'www.example.com' > CNAME
 
-# git init
+git init
+
+echo "[user]" >> .git/config
+echo "    email = 15830559+puttsk@users.noreply.github.com" >> .git/config
+
+
 git add -A
 git commit -m 'deploy'
 
@@ -20,6 +25,6 @@ git commit -m 'deploy'
 # git push -f git@github.com:<USERNAME>/<USERNAME>.github.io.git master
 
 # if you are deploying to https://<USERNAME>.github.io/<REPO>
- git push -f https://github.com/puttsk/tara-su-calculator.git master:gh-pages
+git push -f https://github.com/puttsk/tara-su-calculator.git master:gh-pages
 
 cd -
