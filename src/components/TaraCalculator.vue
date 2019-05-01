@@ -154,7 +154,7 @@
                   {{ [project] | sumCost | roundup }}
                 </td>
                 <td class="num-col subtotal">
-                  {{ [project] | sumDiscount | roundup }}
+                  {{ [project] | sumDiscount(discountPercent) | roundup }}
                 </td>
               </tr>
             </template>
@@ -179,7 +179,9 @@
             <td class="num-col"><b>Total:</b></td>
             <td class="num-col">{{ projects | sumSU | roundup }}</td>
             <td class="num-col">{{ projects | sumCost | roundup }}</td>
-            <td class="num-col">{{ projects | sumDiscount | roundup }}</td>
+            <td class="num-col">
+              {{ projects | sumDiscount(discountPercent) | roundup }}
+            </td>
           </tr>
           <!-- End summarize all project usage -->
         </table>
@@ -338,7 +340,7 @@ export default {
       }
       return sum;
     },
-    sumDiscount: function(projects) {
+    sumDiscount: function(projects, discountPercent) {
       var sum = 0;
       for (var i = 0; i < projects.length; i++) {
         for (var j = 0; j < projects[i].partitions.length; j++) {
