@@ -280,12 +280,26 @@ var projectTemplate = {
       usage: 0,
       suFactor: 130,
       unit: "nodes"
+    },
+    {
+      name: "dgx",
+      walltime: 0,
+      usage: 0,
+      suFactor: 815,
+      unit: "nodes"
+    },
+    {
+      name: "dgx-preempt",
+      walltime: 0,
+      usage: 0,
+      suFactor: 815,
+      unit: "nodes"
     }
   ]
 };
 
-var pricePerSU = 0.0202;
-var discountPercent = 50;
+var pricePerSU = 0.045;
+var discountPercent = 90;
 var timeFactor = {
   mins: 1,
   hrs: 60,
