@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="md-layout" style="float:left;">
+    <div class="md-layout" style="float:left;margin-right:20px;">
       <!-- SU calculator -->
       <div style="padding:10px;">
         <div class="md-title cal-title">TARA SU Calculator</div>
@@ -45,7 +45,7 @@
                   <md-input
                     v-model="project.runs"
                     type="number"
-                    style="text-align:right; width:50px;"
+                    style="text-align:right; width:45px;"
                   />
                   <span class="md-suffix th-field">runs)</span>
                 </md-field>
@@ -203,7 +203,7 @@
     </div>
 
     <!-- Pricing card -->
-    <md-card>
+    <md-card style="margin-top:60px;">
       <md-card-header>
         <div class="md-title">Pricing</div>
       </md-card-header>
