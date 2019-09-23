@@ -292,7 +292,7 @@ var projectTemplate = {
       name: "dgx-preempt",
       walltime: 0,
       usage: 0,
-      suFactor: 815,
+      suFactor: 400,
       unit: "nodes"
     }
   ]
