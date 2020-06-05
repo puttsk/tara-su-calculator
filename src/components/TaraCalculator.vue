@@ -299,7 +299,7 @@ var projectTemplate = {
 };
 
 var pricePerSU = 0.045;
-var discountPercent = 90;
+var discountPercent = 0;
 var timeFactor = {
   mins: 1,
   hrs: 60,
